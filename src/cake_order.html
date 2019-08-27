@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>订单信息</title>
+    <script src="js/jquery.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/carts.js"></script>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/carts.css">
+    <script>
+        // let uid = sessionStorage.getItem("uid");
+
+        ORDER_URL = "http://localhost:8080/api/v1/order"
+        $(function () {
+            let id = 8;
+            if(id!=undefined){
+            let date = {
+                uid : id
+            };
+            $.getJSON(ORDER_URL,date,function (results) {
+                if (results.status === 200) {
+                    let $select = $(".cartMain");
+                    let i = 1;
+                    for (let result of results.data) {
+                        for(let userList of result.userList){
+                            $("#login").replaceWith($("<a>").attr({"href":"login.html"}).text(userList.username));
+                            $("#register").remove();
+                            $("#h2").remove()
+                        }
+                    let $ul = $("<ul>");
+                    $select
+                        .append($("<div>").addClass("cartBox")
+                            .append($("<div>").addClass("order_content")
+                                .append($ul)))
+                    $ul.addClass("order_lists")
+                    $ul
+                        .append($("<li>").addClass("list_chk")
+                            .append($("<input>").addClass("son_check").attr({
+                                "type": "checkbox",
+                                "id": "checkbox_" + i + 1
+                            }))
+                            .append($("<label>").addClass("shop").attr("for", "checkbox_" + i + 1)))
+                    shopList($ul, result)
+                    $ul
+                        .append($("<li>").addClass("list_op")
+                            .append($("<p>").addClass("del")
+                                .append($("<a>").addClass("delBtn").attr("href", "javascript:;").text("移除商品"))))
+                    i++;
+                }
+                }
+            })
+            }else{
+                alert("请先登录")
+                window.location.href = "login.html"
+            }
+        })
+        function shopList($ul,result){
+            for (let shopList of result.shopList){
+                $ul
+                    .append($("<li>").addClass("list_con")
+                        .append($("<div>").addClass("list_img")
+                            .append($("<a>").attr("href","javascript:;")
+                                .append($("<img>").attr({"src":shopList.shopImage,"alt":""}))))
+                        .append($("<div>").addClass("list_text")
+                            .append($("<a>").attr("href","javascript:;").text(shopList.shopName))));
+
+                    typeList($ul,shopList);
+                $ul
+                    .append($("<li>").addClass("list_price")
+                        .append($("<p>").addClass("price").text("￥"+shopList.price)))
+                    .append($("<li>").addClass("list_amount")
+                        .append($("<div>").addClass("amount_box")
+                            .append($("<a>").addClass("reduce reSty").attr("href","javascript:;").text("-"))
+                            .append($("<input>").addClass("sum").attr({"type":"text","value":"1"}))
+                            .append($("<a>").addClass("plus").attr("href","javascript:;").text("+"))))
+                    .append($("<li>").addClass("list_sum")
+                        .append($("<p>").addClass("sum_price").text("￥"+shopList.price)))
+            }
+        }
+        function typeList($ul,shopList) {
+            for (let typeList of shopList.typeList){
+                $ul
+                    .append($("<li>").addClass("list_info")
+                        .append($("<p>").text(typeList.typeName)))
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F3F0E9;
+        }
+        .cartMain_hd{
+            background-color:#fffcc7;
+        }
+        .login{
+            float: right;
+            margin-top: -70px;
+        }
+        .login a{
+            text-decoration: none;
+        }
+        .login img{
+            margin-top: -5px;
+        }
+        .list_img img{
+            height: 90px;
+            width: 90px;
+        }
+        .list_text a{
+            text-align: center;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <!--头部-->
+    <div class="head row" style="padding-left:20px;padding-right:10px">
+        <div class="pic pull-left">
+            <a href="index.html"><img src="images/main_02.png" width="360" height="94"/></a>
+        </div>
+        <div class="login">
+            <div style="display:block;">
+                <div class="puu pull-right" style="margin-right: 16px">
+                    <img src="images/login_01.png" width="19" height="11" alt="" id="h1"/><a href="#" rel="popup1" class="poplight" id="login">登录</a>
+                    <img src="images/login_01.png" width="19" height="11" alt="" id="h2"/><a href="#" target="_blank" id="register">新用户注册</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="cartMain">
+    <div class="cartBox">
+        <div class="shop_info">
+            <div class="cartMain_hd">
+                <ul class="order_lists cartTop">
+                    <li class="list_chk">
+                        <!--所有商品全选-->
+                        <input type="checkbox" id="all" class="whole_check">
+                        <label for="all"></label>
+                        全选
+                    </li>
+                    <li class="list_con">商品信息</li>
+                    <li class="list_info">商品参数</li>
+                    <li class="list_price">单价</li>
+                    <li class="list_amount">数量</li>
+                    <li class="list_sum">金额</li>
+                    <li class="list_op">操作</li>
+                </ul>
+            </div>
+        </div>
+        <div class="order_content">
+            <ul class="order_lists">
+                <li class="list_chk">
+                    <input type="checkbox" id="checkbox_112" class="son_check">
+                    <label for="checkbox_112"></label>
+                </li>
+                <li class="list_con">
+                    <div class="list_img"><a href="javascript:;"><img src="images/1.png" alt=""></a></div>
+                    <div class="list_text"><a href="javascript:;">夏季男士迷彩无袖T恤圆领潮流韩版修身男装背心青年时尚打底衫男</a></div>
+                </li>
+                <li class="list_info">
+                    <p>规格：默认</p>
+                    <p>尺寸：16*16*3(cm)</p>
+                </li>
+                <li class="list_price">
+                    <p class="price">￥1980</p>
+                </li>
+                <li class="list_amount">
+                    <div class="amount_box">
+                        <a href="javascript:;" class="reduce reSty">-</a>
+                        <input type="text" value="1" class="sum">
+                        <a href="javascript:;" class="plus">+</a>
+                    </div>
+                </li>
+                <li class="list_sum">
+                    <p class="sum_price">￥1980</p>
+                </li>
+                <li class="list_op">
+                    <p class="del"><a href="javascript:;" class="delBtn">移除商品</a></p>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <!--底部-->
+    <div class="bar-wrapper">
+        <div class="bar-right">
+            <div class="piece">已选商品<strong class="piece_num">0</strong>件</div>
+            <div class="totalMoney">共计: <strong class="total_text">0.00</strong></div>
+            <div class="calBtn"><a href="javascript:;">结算</a></div>
+        </div>
+    </div>
+    <div class="cartBox">
+        <div class="order_content">
+            <ul class="order_lists">
+                <li class="list_chk">
+                    <input type="checkbox" id="checkbox_1" class="son_check">
+                    <label for="checkbox_1"></label>
+                </li>
+                <li class="list_con">
+                    <div class="list_img"><a href="javascript:;"><img src="images/1.png" alt=""></a></div>
+                    <div class="list_text"><a href="javascript:;">夏季男士迷彩无袖T恤圆领潮流韩版修身男装背心青年时尚打底衫男</a></div>
+                </li>
+                <li class="list_info">
+                    <p>规格：默认</p>
+                    <p>尺寸：16*16*3(cm)</p>
+                </li>
+                <li class="list_price">
+                    <p class="price">￥1980</p>
+                </li>
+                <li class="list_amount">
+                    <div class="amount_box">
+                        <a href="javascript:;" class="reduce reSty">-</a>
+                        <input type="text" value="1" class="sum">
+                        <a href="javascript:;" class="plus">+</a>
+                    </div>
+                </li>
+                <li class="list_sum">
+                    <p class="sum_price">￥1980</p>
+                </li>
+                <li class="list_op">
+                    <p class="del"><a href="javascript:;" class="delBtn">移除商品</a></p>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</section>
+<section class="model_bg"></section>
+<section class="my_model">
+    <p class="title">删除宝贝<span class="closeModel">X</span></p>
+    <p>您确认要删除该宝贝吗？</p>
+    <div class="opBtn"><a href="javascript:;" class="dialog-sure">确定</a><a href="javascript:;" class="dialog-close">关闭</a></div>
+</section>
+
+</body>
+</html>
